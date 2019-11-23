@@ -49,7 +49,17 @@ namespace WebApi
 
         public string GetStatistics()
         {
-            return "{'db': 'stats'}";
+            Dictionary<string, string> dict;
+            using (var context = new ImageContext())
+            {
+                dict = context.GetStatistics();
+            }
+            var response = new JsonObject();
+            foreach (var pair in dict)
+            {
+                response.Add(pair.Key, pair.Value);
+            }
+            return response.ToString();
         }
 
         public string DropImagesTable()

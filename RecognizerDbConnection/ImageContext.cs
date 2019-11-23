@@ -178,7 +178,16 @@ namespace RecognizerDbConnection
                 Counter = 0
             });
             SaveChanges();
+        }
 
+        public Dictionary<string, string> GetStatistics()
+        {
+            var dict = new Dictionary<string, string>();
+            foreach (var image in RecognizedImages)
+            {
+                dict.Add("ImageId:" + image.Id.ToString(), image.Counter.ToString());
+            }
+            return dict;
         }
 
     }
