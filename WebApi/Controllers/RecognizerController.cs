@@ -1,16 +1,19 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-
-// For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+using WebApi;
 
 namespace WebApi.Controllers
 {
     [Route("api/[controller]")]
     public class RecognizerController : Controller
     {
+        private RecognizerBackend backend = new RecognizerBackend();
+
         // GET: api/<controller>
         [HttpGet]
         public IEnumerable<string> Get()
@@ -32,26 +35,29 @@ namespace WebApi.Controllers
             return "POST an image here to get its class and number of db requests.";
         }
 
-        // POST api/<controller>
+        // POST api/recognizer/detect
         [HttpPost("detect")]
-        public string Post([FromBody]string value)
+        public string Post()
         {
-
-            return "Work in progress";
+            byte[] bytes;
+            var ms = new MemoryStream(2048);
+            Request.Body.CopyTo(ms);
+            bytes = ms.ToArray();
+            return backend.DetectImage(bytes);
         }
 
         // GET api/recognizer/detect
         [HttpGet("stats")]
         public string GetStats()
         {
-            return "Returns JSON string with db statistics.";
+            return backend.GetStatistics();
         }
 
         // GET api/recognizer/detect
         [HttpGet("drop_table")]
         public string GetDropTable()
         {
-            return "Returns some success code probably.";
+            return backend.DropImagesTable();
         }
 
         // PUT api/<controller>/5

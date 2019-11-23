@@ -5,8 +5,7 @@ using System.Collections.Concurrent;
 using System.IO;
 using System.Numerics.Tensors;
 using System.Threading;
-
-
+using System.Drawing;
 
 namespace MnistImageRecognizer
 {
@@ -177,6 +176,34 @@ namespace MnistImageRecognizer
             threads[numberOfThreads - 1].Start();
 
             return resultsCollection;
+        }
+
+        public string DetectImageClassSync(Image image, string modelPath)
+        {
+            string resultingClass = "Couldn't recognize the image :c";
+            Tensor<float> tensor = ImageReader.GetTensorFromImage(image);
+            using (var session = new InferenceSession(modelPath))
+            {
+                var inputMeta = session.InputMetadata;
+                var inputs = new List<NamedOnnxValue>();
+
+                foreach (var name in inputMeta.Keys)
+                {
+                    inputs.Add(NamedOnnxValue.CreateFromTensor<float>(name, tensor));
+
+                }
+
+                using (var results = session.Run(inputs))
+                {
+                    foreach (var result in results)
+                    {
+                        var resultTensor = result.AsTensor<float>();
+                        int recognizedDigit = TensorArgMax(resultTensor);
+                        resultingClass = recognizedDigit.ToString();
+                    }
+                }
+            }
+            return resultingClass;
         }
     }
 }

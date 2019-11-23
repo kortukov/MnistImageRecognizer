@@ -10,7 +10,6 @@ using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Threading;
 using MnistImageRecognizer;
-using ImageDbConnection;
 
 namespace Task2
 {
@@ -31,12 +30,12 @@ namespace Task2
 
             BlockingCollection<string> savedResults;
             string[] unrecognizedImagePaths;
-            using (var context = new ImageContext())
-            {
-                var savedResultsAndFilteredPaths = context.GetRecognizedAndUnrecognizedImages(imagePaths);
-                savedResults = savedResultsAndFilteredPaths.Item1;
-                unrecognizedImagePaths = savedResultsAndFilteredPaths.Item2;
-            }
+            //using (var context = new ImageContext())
+            //{
+            //    var savedResultsAndFilteredPaths = context.GetRecognizedAndUnrecognizedImages(imagePaths);
+            //    savedResults = savedResultsAndFilteredPaths.Item1;
+            //    unrecognizedImagePaths = savedResultsAndFilteredPaths.Item2;
+            //}
 
             
             dispatcher.BeginInvoke((Action)(() =>
@@ -44,11 +43,11 @@ namespace Task2
                 Images.Clear();
             }));
             
-            DrawRecognitionResults(savedResults, dispatcher, ClassList, token, false);
+            //DrawRecognitionResults(savedResults, dispatcher, ClassList, token, false);
 
-            var recognized_results = recognizer.RunModelInference(modelPath, unrecognizedImagePaths, token);
+            //var recognized_results = recognizer.RunModelInference(modelPath, unrecognizedImagePaths, token);
 
-            DrawRecognitionResults(recognized_results, dispatcher, ClassList, token, true);
+            //DrawRecognitionResults(recognized_results, dispatcher, ClassList, token, true);
 
         }
 
@@ -93,10 +92,10 @@ namespace Task2
                         }
                         if (save)
                         {
-                            using (var context = new ImageContext())
-                            {
-                                context.SaveRecognitionResult(path_and_class[0], path_and_class[1]);
-                            }
+                            //using (var context = new ImageContext())
+                            //{
+                            //    context.SaveRecognitionResult(path_and_class[0], path_and_class[1]);
+                            //}
                         }
                     }));
 
@@ -128,10 +127,10 @@ namespace Task2
 
         public void DropDB()
         {
-            using (var context = new ImageContext())
-            {
-                context.Clear();
-            }
+            //using (var context = new ImageContext())
+            //{
+            //    context.Clear();
+            //}
             
         }
 

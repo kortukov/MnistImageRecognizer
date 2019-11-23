@@ -16,7 +16,13 @@ namespace MnistImageRecognizer
             Tensor<float> tensor = ConvertImageToTensor(bitmap);
             return tensor;
         }
-        
+
+        public static Tensor<float> GetTensorFromImage(Image image)
+        {
+            Bitmap bitmap = new Bitmap(image);
+            Tensor<float> tensor = ConvertImageToTensor(bitmap);
+            return tensor;
+        }
         public static Bitmap GetBitmapFromFile(string filepath)
         {
             return new Bitmap(filepath);
