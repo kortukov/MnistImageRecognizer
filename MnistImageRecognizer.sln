@@ -1,0 +1,63 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29306.81
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MnistImageRecognizer", "MnistImageRecognizer\MnistImageRecognizer.csproj", "{09F145B8-F777-4C58-91C6-262117D8FFA4}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Task1", "Task1\Task1.csproj", "{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Task2", "Task2\Task2.csproj", "{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}"
+	ProjectSection(ProjectDependencies) = postProject
+		{09F145B8-F777-4C58-91C6-262117D8FFA4} = {09F145B8-F777-4C58-91C6-262117D8FFA4}
+	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ImageDbConnection", "ImageDbConnection\ImageDbConnection.csproj", "{1EBB8625-481E-4173-AAA6-CC79C380638E}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Debug|x64 = Debug|x64
+		Release|Any CPU = Release|Any CPU
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Debug|x64.Build.0 = Debug|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Release|x64.ActiveCfg = Release|Any CPU
+		{09F145B8-F777-4C58-91C6-262117D8FFA4}.Release|x64.Build.0 = Release|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Release|x64.ActiveCfg = Release|Any CPU
+		{CF4622BF-8807-4107-9996-B5E2DF1AB1F9}.Release|x64.Build.0 = Release|Any CPU
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Debug|x64.ActiveCfg = Debug|x64
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Debug|x64.Build.0 = Debug|x64
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Release|Any CPU.Build.0 = Release|Any CPU
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Release|x64.ActiveCfg = Release|x64
+		{147BE7D6-C1EF-49BB-8985-80ACCF89FE60}.Release|x64.Build.0 = Release|x64
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Debug|x64.Build.0 = Debug|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Release|x64.ActiveCfg = Release|Any CPU
+		{1EBB8625-481E-4173-AAA6-CC79C380638E}.Release|x64.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D31FBE4A-CD48-4418-B64B-2CAA6569FF7B}
+	EndGlobalSection
+EndGlobal
