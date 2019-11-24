@@ -55,6 +55,6 @@
                 </GridView>
             </ListView.View>
         </ListView>
-        <Button Margin="10,401,502.667,30" Command="ApplicationCommands.Close" Content="Отмена"></Button>
+        <Button Margin="10,401,502.667,30" Command="ApplicationCommands.Close" Content="Убрать картинки"></Button>
     </Grid>
 </Window>

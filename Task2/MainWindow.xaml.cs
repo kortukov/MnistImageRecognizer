@@ -53,7 +53,7 @@ namespace Task2
         }
         private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            tokenSource.Cancel();
+            MainViewModel.ClearImages();
         }
         private MainViewModel MainViewModel { get; set; } = new MainViewModel();
 

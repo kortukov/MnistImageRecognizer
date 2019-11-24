@@ -197,5 +197,10 @@ namespace Task2
             }
         }
 
+        public void ClearImages()
+        {
+            Images.Clear();
+        }
+
     }
 }
