@@ -10,6 +10,7 @@ using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
+using System.Windows.Forms;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
@@ -29,16 +30,15 @@ namespace Task2
         CancellationToken token;
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
+            OpenFileDialog dialog = new OpenFileDialog();
             dialog.InitialDirectory = "C:\\csharp";
-            dialog.IsFolderPicker = true;
-            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
+            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
             {
-                imagesDirectory = dialog.FileName;
-                imagesDirectory.Replace(@"\", @"\\");
-                UpdateImages(); 
-               
+                var fileName = dialog.FileName;
+                byte[] imageBytes = File.ReadAllBytes(fileName);
+                MainViewModel.UpdateRecognitionResults(imageBytes, fileName, ClassList, Dispatcher);
             }
+            
         }
         private void UpdateImages()
         {
@@ -84,6 +84,14 @@ namespace Task2
         private void DropDB_Click(object sender, RoutedEventArgs e)
         {
             MainViewModel.DropDB();
+        }
+
+        private void Stats_Click(object sender, RoutedEventArgs e)
+        {
+            updatingTask = Task.Run(() =>
+            {
+                MainViewModel.UpdateStats(StatsTextBox, Dispatcher);
+            }, token);
         }
     }
 }

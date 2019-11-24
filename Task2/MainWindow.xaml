@@ -25,17 +25,19 @@
             </MenuItem>
         </Menu>
 
-        <TextBlock Margin="610,89,147.333,333" Grid.ColumnSpan="2">
+        <TextBlock Margin="623,89,133.333,333" Grid.ColumnSpan="2">
             <TextBlock.Text>
                 <Binding Source="{StaticResource MyView}" Path="Count"  
                     StringFormat="{}Count: {0:D}" />
             </TextBlock.Text>
         </TextBlock>
 
-        <ComboBox Name="ClassList" Margin="41.333,89,10.333,333" Grid.Column="1" SelectionChanged="NewClass">
-
+        <ComboBox Name="ClassList" Margin="25.333,18,26.333,404" Grid.Column="1" SelectionChanged="NewClass" RenderTransformOrigin="0.703,0.452">
         </ComboBox>
+
+        <TextBox x:Name="StatsTextBox" TextWrapping="Wrap" Margin="25.333,247,26.333,77" Grid.Column="1"/>
         <Button Content="Очистить базу данных" Click="DropDB_Click"  Margin="282,10,172.667,404"/>
+        <Button Content="Статистика" Click="Stats_Click"  Margin="25.333,196,26.333,239" Grid.Column="1"/>
         <ListView x:Name="mainListView" ItemsSource="{Binding Source={StaticResource MyView}}" Margin="10,61,43.667,77">
             <ListView.View>
                 <GridView>

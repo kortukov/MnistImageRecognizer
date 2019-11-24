@@ -8,7 +8,7 @@ namespace Task2
 {
     public class ImageViewModel
     {
-        public ImageViewModel(string name, string path, string recognizedClass, int counter)
+        public ImageViewModel(string name, string path, string recognizedClass, string counter)
         {
             Name = name;
             Path = path;
@@ -19,6 +19,6 @@ namespace Task2
         public string Name { get; set; }
         public string Path { get; set; }
         public string RecognizedClass { get; set; }
-        public int  Counter { get; set; }
+        public string  Counter { get; set; }
     }
 }
