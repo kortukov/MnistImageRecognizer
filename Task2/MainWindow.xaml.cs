@@ -30,27 +30,20 @@ namespace Task2
         CancellationToken token;
         private void NewCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
-            OpenFileDialog dialog = new OpenFileDialog();
+            CommonOpenFileDialog dialog = new CommonOpenFileDialog();
             dialog.InitialDirectory = "C:\\csharp";
-            if (dialog.ShowDialog() == System.Windows.Forms.DialogResult.OK)
+            dialog.IsFolderPicker = true;
+            if (dialog.ShowDialog() == CommonFileDialogResult.Ok)
             {
                 var fileName = dialog.FileName;
-                byte[] imageBytes = File.ReadAllBytes(fileName);
-                MainViewModel.UpdateRecognitionResults(imageBytes, fileName, ClassList, Dispatcher);
+                var files = Directory.GetFiles(fileName);
+                //byte[] imageBytes = File.ReadAllBytes(fileName);
+                //MainViewModel.UpdateRecognitionResults(imageBytes, fileName, ClassList, Dispatcher);
+                MainViewModel.UpdateManyImages(files, ClassList, Dispatcher);
             }
             
         }
-        private void UpdateImages()
-        {
-            tokenSource.Dispose();
-            tokenSource = new CancellationTokenSource();
-            token = tokenSource.Token;
-            updatingTask = Task.Run(() =>
-            {
-                MainViewModel.Update(imagesDirectory, Dispatcher, ClassList, token);
-            }, token);
-           
-        }
+        
         private void CloseCommand_Executed(object sender, ExecutedRoutedEventArgs e)
         {
             MainViewModel.ClearImages();

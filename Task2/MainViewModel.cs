@@ -5,11 +5,13 @@ using System.Collections.ObjectModel;
 using System.IO;
 using System.Json;
 using System.Linq;
+using System.Net;
 using System.Net.Http;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Forms;
 using System.Windows.Threading;
 using MnistImageRecognizer;
 
@@ -22,91 +24,12 @@ namespace Task2
         private string modelPath = @"C:\csharp\MnistImageRecognizer\model\model.onnx";
         static HttpClient client = new HttpClient();
         private Dispatcher dispatcher;
+        private bool exceptionShown;
         public MainViewModel()
         {
             Images = new ObservableCollection<ImageViewModel>();
         }
-        public void Update(string dataPath, Dispatcher dispatcher, ComboBox ClassList, CancellationToken token)
-        {
-            recognizer = new ImageRecognizer();
-            string[] imagePaths = GetFilesFromDirectory(dataPath);
-
-            BlockingCollection<string> savedResults;
-            string[] unrecognizedImagePaths;
-            //using (var context = new ImageContext())
-            //{
-            //    var savedResultsAndFilteredPaths = context.GetRecognizedAndUnrecognizedImages(imagePaths);
-            //    savedResults = savedResultsAndFilteredPaths.Item1;
-            //    unrecognizedImagePaths = savedResultsAndFilteredPaths.Item2;
-            //}
-
-            
-            dispatcher.BeginInvoke((Action)(() =>
-            {
-                Images.Clear();
-            }));
-            
-            //DrawRecognitionResults(savedResults, dispatcher, ClassList, token, false);
-
-            //var recognized_results = recognizer.RunModelInference(modelPath, unrecognizedImagePaths, token);
-
-            //DrawRecognitionResults(recognized_results, dispatcher, ClassList, token, true);
-
-        }
-
-        //public void DrawRecognitionResults(BlockingCollection<string> results, Dispatcher dispatcher, ComboBox ClassList, CancellationToken token, Boolean save)
-        //{
-        //    string result;
-
-        //    if (token.IsCancellationRequested)
-        //    {
-        //        return;
-        //    }
-
-        //    while (!results.IsCompleted)
-        //    {
-        //        while (results.TryTake(out result))
-        //        {
-        //            if (token.IsCancellationRequested)
-        //            {
-        //                return;
-        //            }
-        //            string[] path_and_class = result.Split('\n');
-        //            dispatcher.BeginInvoke((Action)(() =>
-        //            {
-        //                int db_access_counter = 0;
-        //                if (! save) // Getting results from db
-        //                {
-        //                    string[] class_and_counter = path_and_class[1].Split('$');
-        //                    path_and_class[1] = class_and_counter[0];
-        //                    int add;
-        //                    if (Int32.TryParse(class_and_counter[1], out add))
-        //                    {
-        //                        db_access_counter += add;
-        //                    }
-        //                }
-
-
-        //                Images.Add(new ImageViewModel(path_and_class[0], path_and_class[0], path_and_class[1], db_access_counter));
-        //                int index = ClassList.Items.IndexOf(path_and_class[1]);
-        //                if (index == -1)
-        //                {
-        //                    ClassList.Items.Add(path_and_class[1]);
-        //                }
-        //                if (save)
-        //                {
-        //                    //using (var context = new ImageContext())
-        //                    //{
-        //                    //    context.SaveRecognitionResult(path_and_class[0], path_and_class[1]);
-        //                    //}
-        //                }
-        //            }));
-
-        //        }
-        //    }
-        //}
-
-
+        
         public string[] GetFilesFromDirectory(string path)
         {
             string[] filenames;
@@ -131,38 +54,178 @@ namespace Task2
         public void DropDB()
         {
             Task.Run(async () => {
-                var response = await client.GetAsync("https://localhost:44359/api/recognizer/drop_table");
+                try
+                {
+                    var response = await client.GetAsync("https://localhost:44359/api/recognizer/drop_table");
+                    if (response.StatusCode != HttpStatusCode.OK)
+                    {
+                        string error_msg = response.StatusCode.ToString();
+                        System.Windows.Forms.MessageBox.Show("Response status code " + error_msg , "HTTP not OK", 
+                            System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        return;
+                    }
+                }
+                catch (HttpRequestException e)
+                {
+                    System.Windows.Forms.MessageBox.Show("Http Request Failed", "HTTP not OK",
+                           System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
             });
         }
 
 
-        public void UpdateStats(TextBox StatsTextBox, Dispatcher dispatcher)
+        public void UpdateStats(System.Windows.Controls.TextBox StatsTextBox, Dispatcher dispatcher)
         {
             Task.Run(() => RequestStatsAsync(StatsTextBox, dispatcher));
         }
 
-        static async void RequestStatsAsync(TextBox StatsTextBox, Dispatcher dispatcher)
+        static async void RequestStatsAsync(System.Windows.Controls.TextBox StatsTextBox, Dispatcher dispatcher)
         {
 
-            var response = await client.GetAsync("https://localhost:44359/api/recognizer/stats");
+            string result;
+            try
+            {
+                var response = await client.GetAsync("https://localhost:44359/api/recognizer/stats");
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    string error_msg = response.StatusCode.ToString();
+                    System.Windows.Forms.MessageBox.Show("Response status code " + error_msg, "HTTP not OK",
+                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                result = await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException e)
+            {
+                System.Windows.Forms.MessageBox.Show("Http Request Failed", "HTTP not OK",
+                           System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
             await dispatcher.BeginInvoke((Action)(async () =>
              {
-                 string result = await response.Content.ReadAsStringAsync();
                  StatsTextBox.Text = result;
              }));
         }
 
-        public void UpdateRecognitionResults(byte[] imageBytes, string imagePath, ComboBox ClassList, Dispatcher dispatcher)
+        async public void UpdateManyImages(string[] files, System.Windows.Controls.ComboBox ClassList, Dispatcher dispatcher)
+        {
+            string detectEndPoint = "https://localhost:44359/api/recognizer/detect";
+            List<MultipartFormDataContent> contents = new List<MultipartFormDataContent>();
+            foreach (string fileName in files)
+            {
+                byte[] imageBytes = File.ReadAllBytes(fileName);
+                var byteContent = new ByteArrayContent(imageBytes);
+                var stringContent = new StringContent(fileName);
+                MultipartFormDataContent multipartContent = new MultipartFormDataContent();
+                multipartContent.Add(byteContent, "ImageBytes", fileName);
+                multipartContent.Add(stringContent, "Path");
+                contents.Add(multipartContent);
+                //UpdateRecognitionResults(imageBytes, fileName, ClassList, dispatcher);
+            }
+
+            List<Task<HttpResponseMessage>> tasks = new List<Task<HttpResponseMessage>>();
+            foreach (var content in contents)
+            {
+                tasks.Add(client.PostAsync(detectEndPoint, content));
+            }
+              
+            
+
+            try
+            {
+                await Task.WhenAll(tasks.ToArray());
+            }
+            catch (Exception e)
+            {
+                System.Windows.Forms.MessageBox.Show("Http Request Failed" + e.ToString(), "HTTP not OK",
+                           System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                return;
+            }
+
+            List<HttpResponseMessage> responses = new List<HttpResponseMessage>();
+            foreach (var request in tasks)
+            {
+                if (request.Status != TaskStatus.Faulted)
+                {
+                    responses.Add(request.Result);
+                }
+            }
+
+
+            string result;
+            foreach (var r in responses)
+            {
+                if (r.StatusCode != HttpStatusCode.OK)
+                {
+                    string error_msg = r.StatusCode.ToString();
+                    System.Windows.Forms.MessageBox.Show("Response status code " + error_msg, "HTTP not OK",
+                        System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    return;
+                }
+                result = await r.Content.ReadAsStringAsync();
+                var json_result = JsonValue.Parse(result);
+                string resultingClass = json_result["class"];
+                string db_queries = json_result["db_queries"];
+                string image_path = json_result["image_path"];
+                await dispatcher.BeginInvoke((Action)(() =>
+                {
+                    var added = AddImage(new ImageViewModel(image_path, image_path, resultingClass, db_queries));
+                    if (added)
+                    {
+                        int index = ClassList.Items.IndexOf(resultingClass);
+                        if (index == -1)
+                        {
+                            ClassList.Items.Add(resultingClass);
+                        }
+                    }
+
+                }));
+            }
+            
+
+        }
+
+
+        public void UpdateRecognitionResults(byte[] imageBytes, string imagePath, System.Windows.Controls.ComboBox ClassList, Dispatcher dispatcher)
         {
             Task.Run(() => RequestImageDetectionAsync(imageBytes, imagePath, ClassList, dispatcher));
         }
 
-        async void RequestImageDetectionAsync(byte[] imageBytes, string imagePath, ComboBox ClassList, Dispatcher dispatcher)
+        async void RequestImageDetectionAsync(byte[] imageBytes, string imagePath, System.Windows.Controls.ComboBox ClassList, Dispatcher dispatcher)
         {
 
             var content = new ByteArrayContent(imageBytes);
-            var response = await client.PostAsync("https://localhost:44359/api/recognizer/detect", content);
-            string result = await response.Content.ReadAsStringAsync();
+            string result;
+            try
+            {
+                var response = await client.PostAsync("https://localhost:44359/api/recognizer/detect", content);
+                if (response.StatusCode != HttpStatusCode.OK)
+                {
+                    if (!exceptionShown)
+                    {
+                        string error_msg = response.StatusCode.ToString();
+                        System.Windows.Forms.MessageBox.Show("Response status code " + error_msg, "HTTP not OK",
+                            System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                        exceptionShown = true;
+                        
+                    }
+                    return;
+                }
+                result = await response.Content.ReadAsStringAsync();
+            }
+            catch (HttpRequestException e)
+            {
+                if (!exceptionShown)
+                {
+                    System.Windows.Forms.MessageBox.Show("Http Request Failed", "HTTP not OK",
+                           System.Windows.Forms.MessageBoxButtons.OK, System.Windows.Forms.MessageBoxIcon.Error);
+                    exceptionShown = true;
+                }
+                return;
+            }
+
             var json_result = JsonValue.Parse(result);
             string resultingClass = json_result["class"];
             string db_queries = json_result["db_queries"];

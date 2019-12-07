@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Http;
 using WebApi;
 
 namespace WebApi.Controllers
@@ -37,13 +38,16 @@ namespace WebApi.Controllers
 
         // POST api/recognizer/detect
         [HttpPost("detect")]
-        public string Post()
+        public string Post([FromForm]RecievedImage recievedImage)
         {
+            string path = recievedImage.Path;
+            var imgBytes = recievedImage.ImageBytes;
+
             byte[] bytes;
             var ms = new MemoryStream(2048);
-            Request.Body.CopyTo(ms);
+            imgBytes.CopyTo(ms);
             bytes = ms.ToArray();
-            return backend.DetectImage(bytes);
+            return backend.DetectImage(bytes, path);
         }
 
         // GET api/recognizer/detect
@@ -59,5 +63,12 @@ namespace WebApi.Controllers
         {
             return backend.DropImagesTable();
         }
+    }
+
+    public class RecievedImage
+    {
+        public string Path { get; set; }
+        public IFormFile ImageBytes { get; set; }
+
     }
 }

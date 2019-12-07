@@ -13,7 +13,7 @@ namespace WebApi
     public class RecognizerBackend
     {
         private string modelPath = @"C:\csharp\MnistImageRecognizer\model\model.onnx";
-        public string DetectImage(byte[] img_bytes)
+        public string DetectImage(byte[] img_bytes, string path)
         {
             Tuple<string, string> class_and_counter;
             string recognizedClass, counter;
@@ -44,6 +44,7 @@ namespace WebApi
             var response = new JsonObject();
             response.Add("class", recognizedClass);
             response.Add("db_queries", counter);
+            response.Add("image_path", path);
             return response.ToString();
         }
 
